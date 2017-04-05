@@ -2,24 +2,28 @@ import React, {Component} from 'react';
 import Chatbar from './Chatbar.jsx';
 import MessageList from './MessageList.jsx';
 
-  class App extends Component {
 
-    constructor() {
-      super();
-      this.state = {currentUser: {name: "Bob"},
-      messages: [
-          {
-            username: "Bob",
-            content: "Has anyone seen my marbles?",
-            key: 1
-          },
-          {
-            username: "Anonymous",
-            content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
-            key: 2
-          }
-        ]};
-    }
+const ws = new WebSocket("ws://localhost:3001");
+
+
+class App extends Component {
+
+  constructor() {
+    super();
+    this.state = {currentUser: {name: "Bob"},
+    messages: [
+        {
+          username: "Bob",
+          content: "Has anyone seen my marbles?",
+          key: 1
+        },
+        {
+          username: "Anonymous",
+          content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
+          key: 2
+        }
+      ]};
+  }
 
 
   render() {

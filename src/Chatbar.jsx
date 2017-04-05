@@ -21,6 +21,9 @@ class ChatBar extends Component {
           <input
             className="chatbar-message"
             placeholder="Type a message and hit ENTER"
+            type="text"
+            value={this.state.newMessage}
+            onChange={this.handleMessageChange}
             />
         </footer>
     );
