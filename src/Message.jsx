@@ -5,7 +5,7 @@ const Message = (props) => (
     <span className="message-username">
                     {props.username}</span>
                   <span className="message-content">
-                    {props.content}</span>
+                    {props.messages}</span>
                 </div>
 )
 export default Message

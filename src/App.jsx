@@ -1,59 +1,102 @@
 import React, {Component} from 'react';
 import Chatbar from './Chatbar.jsx';
 import MessageList from './MessageList.jsx';
+const uuid = require('uuid/v4');
 
 
-const ws = new WebSocket("ws://localhost:3001");
+
+
+
+
+var ws = new WebSocket("ws://localhost:3001");
 
 
 class App extends Component {
 
-  constructor() {
-    super();
-    this.state = {currentUser: {name: "Bob"},
-    messages: [
-        {
-          username: "Bob",
-          content: "Has anyone seen my marbles?",
-          key: 1
-        },
-        {
-          username: "Anonymous",
-          content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
-          key: 2
-        }
-      ]};
+  constructor(props) {
+    super(props);
+    this.state = {currentUser: {name: "Anonymous"},
+    messages: [{}],
+    type: ""};
+  }
+
+handleChangeUser = (userChange) => {
+
+    let newName = this.state.currentUser.name
+    console.log(`userChange message: ${userChange}`);
+    this.setState({ currentUser: {name: userChange}})
+
+    let userChangeMsg = {
+      key: uuid(),
+      messages: `${newName} changed their name to ${userChange}`,
+      username: "Server Alert: ",
+      type: "incomingNotification",
+    }
+
+
+    ws.send((JSON.stringify(userChangeMsg)));
   }
 
 
-  render() {
-    return(
-      <div>
-        <MessageList messages={this.state.messages} />
-        <Chatbar username={this.state.currentUser.name}/>
-      </div>
 
-    )
+  handleSendMessage = (incoming) => {
+    let incomingMsg = {
+      key: uuid(),
+      messages: incoming,
+      username: this.state.currentUser.name,
+      type: "incomingMessage",
+    }
+
+    console.log(`Incoming message: ${incoming}`);
+
+
+    this.setState({ messages: this.state.messages.concat([incomingMsg])
+    })
+
+    ws.send((JSON.stringify(incomingMsg)));
   }
 
   componentDidMount() {
     console.log("componentDidMount <App />");
-    setTimeout(() => {
-      console.log("Simulating incoming message");
-      // Add a new message to the list of messages in the data store
-      const newMessage = {key: 3, username: "Michelle", content: "Hello there!"};
-      const messages = this.state.messages.concat(newMessage)
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({messages: messages})
-    }, 3000);
-  }
 
+
+
+    ws.onmessage = (event) => {
+        let newMessage = JSON.parse(event.data);
+        const messages = this.state.messages.concat(newMessage)
+        switch(newMessage.type) {
+          case "incomingMessage":
+          this.setState({messages: messages})
+            break;
+          case "incomingNotification":
+          this.setState({messages: messages})
+
+            break;
+          default:
+            // show an error in the console if the message type is unknown
+            throw new Error("Unknown event type " + newMessage.type);
+        }
+    }
+  }
+  render() {
+      return(
+        <div>
+
+          <MessageList messages={this.state.messages} />
+          <Chatbar username={this.state.currentUser.name}
+            onSendMessage={this.handleSendMessage}
+            onChangeUser={this.handleChangeUser}
+          />
+        </div>
+
+      )
+    }
 
 }
 
 
 export default App
+
 
 
 
