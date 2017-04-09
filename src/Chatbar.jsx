@@ -29,8 +29,6 @@ class ChatBar extends Component {
     }
   }
 
-
-
   render() {
     return (
         <footer className="chatbar">
